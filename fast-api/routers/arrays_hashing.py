@@ -18,6 +18,13 @@ class ValidAnagramInput(BaseModel):
     s: str = Field(..., description="First string", examples=["anagram"])
     t: str = Field(..., description="Second string", examples=["nagarma"])
 
+class GroupAnagramsInput(BaseModel):
+    strs: list[str] = Field(..., description="Array of strings", examples=[["act", "pots", "tops", "cat", "stop", "hat"]])
+
+class GroupAnagramsOutput(BaseModel):
+    result: list[list[str]] = Field(..., description="Anagram's groups")
+
+
 
 @router.post("/contains-duplicate")
 def contains_duplicate(data: ContainsDuplicateInput):
@@ -56,4 +63,16 @@ def two_sum(data: TwoSumInput):
     )
 
 
-
+@router.post("/group-anagrams", response_model=GroupAnagramsOutput)
+def group_anagrams(data: GroupAnagramsInput):
+    anagram_map = defaultdict(list)
+    
+    for string in data.strs:
+        count = [0] * 26
+        for char in string:
+            count[ord(char) - ord('a')] += 1
+            
+        count_key = tuple(count)
+        anagram_map[count_key].append(string)
+        
+    return {"result": list(anagram_map.values())}
