@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from pydantic import BaseModel, Field
 from routers import arrays_hashing
 
 app = FastAPI(
@@ -7,7 +8,10 @@ app = FastAPI(
     version="1.0.0"
 )
 app.include_router(arrays_hashing.router)
-
-@app.get("/")
+class RootOutput(BaseModel):
+    message: str = Field(..., description="Intro message", examples=["Welcome to Neetcode API"])
+@app.get("/", response_model=RootOutput)
 def root():
-    return {"message": "Welcome to Neetcode API"}
+    return RootOutput(
+        message="Welcome to Neetcode API"
+    )

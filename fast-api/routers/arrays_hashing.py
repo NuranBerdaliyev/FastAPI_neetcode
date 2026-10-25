@@ -22,9 +22,15 @@ class GroupAnagramsInput(BaseModel):
     strs: list[str] = Field(..., description="Array of strings", examples=[["act", "pots", "tops", "cat", "stop", "hat"]])
 
 class GroupAnagramsOutput(BaseModel):
-    result: list[list[str]] = Field(..., description="Anagram's groups")
+    result: list[list[str]] = Field(..., description="Anagram's groups", examples=[[["act", "cat"], ["pots", "tops", "stop"], ["hat"]]])
 
+class EncodeDecodeInput(BaseModel):
+    strs: list[str] = Field(..., description="Array of string for encoding and decoding", examples=[["Hello,World", "4#", "   ", "neet#code"]])
 
+class EncodeDecodeOutput(BaseModel):
+    strs: list[str] = Field(..., description="Input", examples=[["Hello,World", "4#", "   ", "neet#code"]])
+    encoded_str: str = Field(..., description="Result of encoding input", examples=["11#Hello,World2#4#3#   9#neet#code"])
+    decoded_str: list[str] = Field(..., description="Result of decoding the encoded string. It has to be the same input", examples=[["Hello,World", "4#", "   ", "neet#code"]])
 
 @router.post("/contains-duplicate")
 def contains_duplicate(data: ContainsDuplicateInput):
@@ -76,3 +82,29 @@ def group_anagrams(data: GroupAnagramsInput):
         anagram_map[count_key].append(string)
         
     return {"result": list(anagram_map.values())}
+
+@router.post("/encode-decode", response_model=EncodeDecodeOutput)
+def encode_decode_strings(data: EncodeDecodeInput):
+    chunks = []
+    for s in data.strs:
+        chunks.append(str(len(s)) + "#" + s)
+    encoded_res = "".join(chunks)
+    
+    decoded_res = []
+    i = 0
+    while i < len(encoded_res):
+        length = 0
+        j = i
+        while encoded_res[j].isdigit():
+            length = length * 10 + int(encoded_res[j])
+            j += 1
+            
+        word = encoded_res[j + 1 : j + 1 + length]
+        decoded_res.append(word)
+        i = j + 1 + length
+
+    return EncodeDecodeOutput(
+        strs=data.strs,
+        encoded_str=encoded_res,
+        decoded_str=decoded_res
+    )
