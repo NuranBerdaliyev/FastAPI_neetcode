@@ -32,6 +32,12 @@ class EncodeDecodeOutput(BaseModel):
     encoded_str: str = Field(..., description="Result of encoding input", examples=["11#Hello,World2#4#3#   9#neet#code"])
     decoded_str: list[str] = Field(..., description="Result of decoding the encoded string. It has to be the same input", examples=[["Hello,World", "4#", "   ", "neet#code"]])
 
+class ProductExceptSelfInput(BaseModel):
+    nums: list[int] = Field(..., description = "Array of integers", examples = [[-1,0,1,2,3]])
+
+class ProductExceptSelfOutput(BaseModel):
+    nums: list[int] = Field(..., description="Array of integers demonstrating the product of elements except the index where integer is", examples=[[0,-6,0,0,0]])
+
 @router.post("/contains-duplicate")
 def contains_duplicate(data: ContainsDuplicateInput):
     seen = set()
@@ -107,4 +113,27 @@ def encode_decode_strings(data: EncodeDecodeInput):
         strs=data.strs,
         encoded_str=encoded_res,
         decoded_str=decoded_res
+    )
+
+@router.post("/product-except-self", response_model=ProductExceptSelfOutput)
+def product_of_array_except_self(data: ProductExceptSelfInput):
+    number=1
+    prefix_list=[]
+    for num in data.nums:
+        prefix_list.append(number)
+        number*=num
+            
+    number=1
+    suffix_list=[]
+    for num in reversed(data.nums):
+        suffix_list.append(number)
+        number*=num
+
+    suffix_list.reverse()
+    nums=[]
+    for left, right in zip(prefix_list, suffix_list):
+        nums.append(left*right)
+        
+    return ProductExceptSelfOutput(
+        nums = nums
     )
