@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Query, HTTPException, status
+from fastapi import APIRouter, HTTPException, status
 from collections import defaultdict
 from pydantic import BaseModel, Field
 
