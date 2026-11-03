@@ -5,7 +5,7 @@ from routers import arrays_hashing, two_pointers
 app = FastAPI(
     title="NeetCode API Solvers",
     description="Endpoints distributed by algorithm categories",
-    version="1.0.0"
+    version="1.0.1"
 )
 all_modules=[arrays_hashing, two_pointers]
 
